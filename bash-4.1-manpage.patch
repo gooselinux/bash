@@ -1,0 +1,53 @@
+diff -up bash-4.1/doc/bash.1.manpage bash-4.1/doc/bash.1
+--- bash-4.1/doc/bash.1.manpage	2011-01-26 15:30:03.000000000 +0100
++++ bash-4.1/doc/bash.1	2011-01-26 15:47:16.000000000 +0100
+@@ -6646,7 +6646,9 @@ must be \(>= 1.  If
+ .I n
+ is greater than the number of enclosing loops, all enclosing loops
+ are exited.
+-The return value is 0 unless \fIn\fP is not greater than or equal to 1.
++The return value is non-zero when \fIn\fP is \(<= 0; Otherwise,
++.BR break
++returns 0 value.
+ .TP
+ \fBbuiltin\fP \fIshell\-builtin\fP [\fIarguments\fP]
+ Execute the specified shell builtin, passing it
+@@ -7017,7 +7019,15 @@ must be \(>= 1.  If
+ .I n
+ is greater than the number of enclosing loops, the last enclosing loop
+ (the ``top-level'' loop) is resumed.
+-The return value is 0 unless \fIn\fP is not greater than or equal to 1.
++When
++.BR continue
++is executed inside of loop, the return value is non-zero when
++.I n
++is \(<= 0; Otherwise,
++.BR continue
++returns 0 value. When
++.BR continue
++is executed outside of loop, the return value is 0.
+ .TP
+ \fBdeclare\fP [\fB\-aAfFilrtux\fP] [\fB\-p\fP] [\fIname\fP[=\fIvalue\fP] ...]
+ .PD 0
+@@ -9019,9 +9029,19 @@ by default.
+ Suspend the execution of this shell until it receives a
+ .SM
+ .B SIGCONT
+-signal.  A login shell cannot be suspended; the
++signal. When the suspended shell is a background process, it can be restarted
++by the
++.B fg
++command. For more information, read the
++.SM
++.B JOB CONTROL
++section. The
++.B suspend
++command can not suspend the login shell. However, when
+ .B \-f
+-option can be used to override this and force the suspension.
++option is specified,
++.B suspend
++command can suspend even login shell.
+ The return status is 0 unless the shell is a login shell and
+ .B \-f
+ is not supplied, or if job control is not enabled.
