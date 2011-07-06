@@ -5,7 +5,7 @@
 Version: %{baseversion}%{patchlevel}
 Name: bash
 Summary: The GNU Bourne Again shell
-Release: 10%{?dist}
+Release: 4%{?dist}
 Group: System Environment/Shells
 License: GPLv3+
 Url: http://www.gnu.org/software/bash
@@ -46,17 +46,6 @@ Patch123: bash-4.0-nobits.patch
 
 # 605137, Same CFLAGS in examples' Makefile for all arches
 Patch124: bash-4.1-examples.patch
-
-# 618289, don't segfault when trying to bind int variable to array
-# with bad array subsrcipt
-Patch125: bash-4.1-bind_int_variable.patch
-
-# 664468, Builtins like echo and printf won't report errors
-# when output does not succeed due to EPIPE
-Patch126: bash-4.1-broken_pipe.patch
-
-# 619704, Manpages clarifications
-Patch127: bash-4.1-manpage.patch
 
 Requires(post): ncurses-libs
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -108,9 +97,6 @@ This package contains documentation files for %{name}.
 %patch118 -p1 -b .tty_tests
 %patch123 -p1 -b .nobits
 %patch124 -p1 -b .examples
-%patch125 -p1 -b .bind_int_variable
-%patch126 -p1 -b .broken_pipe
-%patch127 -p1 -b .manpage
 
 echo %{version} > _distribution
 echo %{release} > _patchlevel
@@ -122,10 +108,7 @@ autoconf
 # Recycles pids is neccessary. When bash's last fork's pid was X
 # and new fork's pid is also X, bash has to wait for this same pid.
 # Without Recycles pids bash will not wait.
-
-# For -fwrapv option see https://www.securecoding.cert.org/confluence/display/seccode/INT32-C.+Ensure+that+operations+on+signed+integers+do+not+result+in+overflow
-# Bash needs to be fixed.
-make "CFLAGS=$CFLAGS -fwrapv" "CPPFLAGS=-D_GNU_SOURCE -DRECYCLES_PIDS `getconf LFS_CFLAGS`"
+make "CPPFLAGS=-D_GNU_SOURCE -DRECYCLES_PIDS `getconf LFS_CFLAGS`"
 %check
 make check
 
@@ -166,11 +149,6 @@ install -c -m 644 builtins.1 ${RPM_BUILD_ROOT}%{_mandir}/man1/builtins.1
 for i in `cat man.pages` ; do
   echo .so man1/builtins.1 > ${RPM_BUILD_ROOT}%{_mandir}/man1/$i.1
   chmod 0644 ${RPM_BUILD_ROOT}%{_mandir}/man1/$i.1
-done
-
-# remove backup files so they will not be in bash-doc
-for i in bashbug requires manpage; do
-  rm -rf *.$i
 done
 popd
 
@@ -286,34 +264,6 @@ fi
 #%doc doc/*.ps doc/*.0 doc/*.html doc/article.txt
 
 %changelog
-* Thu Jun 9 2011 Clint Savage <herlo@gooseproject.org> - 4.1.2-10
-- GoOSe Project rebuild, iteration 2
-
-* Wed Jun 8 2011 Clint Savage <herlo@gooseproject.org> - 4.1.2-9
-- GoOSe Project rebuild, iteration 1
-
-* Thu Jan 27 2011 Roman Rakus <rrakus@redhat.com> - 4.1.2-8
-- Don't include backup file in bash-doc
-  Resolves: #619704
-
-* Thu Jan 27 2011 Roman Rakus <rrakus@redhat.com> - 4.1.2-7
-- Compile with -fwrapv option to satisfy rpmdiff.
-  Resolves: #619704
-
-* Wed Jan 26 2011 Roman Rakus <rrakus@redhat.com> - 4.1.2-6
-- Few man pages clarifications
-  Resolves: #619704
-
-* Thu Jan 06 2011 Roman Rakus <rrakus@redhat.com> - 4.1.2-5
-- Builtins like echo and printf won't report errors
-  when output does not succeed due to EPIPE
-  Resolves: #664468
-
-* Wed Dec 01 2010 Roman Rakus <rrakus@redhat.com> - 4.1.2-4
-- don't segfault when trying to bind int variable to array
-  with bad array subsrcipt
-  Resolves: #618289
-
 * Tue Jun 22 2010 Roman Rakus <rrakus@redhat.com> - 4.1.2-3
 - Same CFLAGS in examples' Makefile for all arches
   Resolves: #605137
